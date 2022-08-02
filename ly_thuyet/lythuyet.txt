@@ -1,0 +1,163 @@
+**Các câu code: phần 1(câu 1, câu 3); phần 2(câu 4); phần 3(câu 6, câu 7) được viết trong
+index.js và html>index.html
+i)Kiến thức về HTML
+2) Sự khác biệt giữa <textarea> vs <input>
+- <input> là thẻ tạo trường để nhập dữ liệu, nhưng chỉ được một dòng -> dùng để nhập các mục thông tin đơn lẻ: tên, tuổi, thông tin cá nhân, …
+- <textarea> cũng tạo trường nhập dữ liệu, nhưng có thể enter xuống dòng (giống một text editor)
+-> dùng cho comment, reviews, blog, …
+
+ii)Kiến thức về CSS
+1)	Liệt kê 5 css pseudo class/element
+-	Hover
+-	First-child
+-	Active
+-	Checked
+-	Nth-child(n)
+2)	Sự khác nhau giữa rgba và rgb
+Rgb: red, green, blue -> với 3 màu cơ bản sẽ tạo nên các màu khác (giống như pha màu nước trong hội họa)
+Rgba: thêm a là alpha độ mờ -> tạo độ mờ cho màu rgb
+3) Thêm: border-radius: 100%
+
+iii)	Kiến thức về JS
+1)	Có 4 loại for loops:
+Loại 1: for thường
+for (câu lệnh khởi tạo; câu lệnh điều kiện kết thúc; câu lệnh tăng biến) {
+	//code
+}
+Loại 2: forEach dành cho duyệt mảng
+arrayName.forEach(function(giá trị hiện tại, vị trí đang duyệt, array){
+    //code
+})
+Loại 3: for in dành cho duyệt object
+for (variableName in object) {
+    //code
+}
+Loại 4: for of dành cho duyệt các kiểu dữ liệu object như: array, string, map, set, ...
+for (variable of iterable) {
+  //code
+}
+2) Kết quả đoạn code trên là Yah
+Vì: a được gán bằng hàm f, nghĩa là bằng giá trị mà hàm f trả về
+vì b = 9, ++b = 10 < 10 là sai nên toán tử ba ngôi trả về Yah
+3) 
+- Thay if statement thành switch case
+- Bằng việc return đúng chỗ, xóa biến dư roman_number
+function roman_unit(decimal_number) {
+      let decimal = parseInt(decimal_number)
+
+	switch(decimal){
+      	case 1: return 'I'
+       	case 2: return 'II'
+        	case 3: return 'II'
+        	//... go to case 10
+        	default: return '?'
+      }	
+}
+4) RegEx for email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+5) Overview:
+- setTimeOut không nằm trong mã nguồn của V8 engine (engine của ngôn ngữ JS)
+-> nó thuộc web api -> kiến thức liên quan đến event loop
+- JS là ngôn ngữ đơn luồng -> nếu 1 tác vụ chiếm thời gian thì sẽ pause những tác vụ sau đó
+cho đến khi tác vụ đó xong xuôi -> để tránh sự 'đồng bộ' này, ta có khái niệm 'bất đồng bộ'
+khi mà các tác vụ chiếm thời gian như web apis cứ việc thực, những tác vụ khác không cần phải
+chờ nữa mà làm song song
+
+- Đầu tiên, main() sẽ được push vào stack, rồi sequentialStart() được push vào,
+tiếp đến là setTimeout(concurrentStart, 4000) nhưng chưa được vào call stack vội,
+nhớ là setTimeout là webapi thế nên là sequentialStart() được pop khỏi callstack -> 
+được thực thi rồi setTimeout(concurrentStart, 4000) mới được push vào callstack, tương tự
+như vậy với những thằng còn lại cùng là webapi có thời gian setTimeout là 7s, 10s, ... 
+Hệ quả, thứ tự thực thi hàm: 
+sequential start, concurrent start with await, concurrent start with Promise.all, 
+parallel with await promise.all
+
+a) //sequentialStart()
+- Kết quả:
+sau 2 giây in ra slow, 1 giây sau đó in ra fast, cụ thể là:
+==SEQUENTIAL START==
+script.js:2 starting slow promise
+2s sau
+script.js:6 slow promise is done
+script.js:24 slow
+script.js:12 starting fast promise
+1s sau nữa
+script.js:16 fast promise is done
+script.js:26 fast
+- Giải thích:
+sequentialStart() vào callstack, log ra dòng: ==SEQUENTIAL START==,
+Tiếp đó là resolveAfter2Seconds() vào callstack, log dòng "starting slow promise"
+ra tiếp tục còn setTimeout thì vô webapi chờ sau 2s sẽ vào task queue.
+Sau 2s, trong task queue có: resolve('slow') và console.log("slow promise is done")
+const slow = await resolveAfter2Seconds() nghĩa là chờ cho đến khi promise 
+return bên trong resolveAfter2Seconds() trả về giá trị, theo thứ tự của queue (vô trước làm trước)
+thì resolve('slow') được thực hiện trước -> const slow = 'slow', 
+rồi console.log("slow promise is done") được thực hiện -> "slow promise is done" được in
+rồi mới tới dòng console.log(slow) -> in 'slow' ra màn hình
+Nối tiếp là resolveAfter1Second(), tương tự, log dòng "starting slow promise" trước rồi
+1s sau nữa, trong task quue có resolve('fast') và console.log("fast promise is done")
+và cũng tương tự thì "fast promise is done" được in ra rồi đến 'fast'
+b) //setTimeout(concurrentStart, 4000)
+- Kết quả:
+==CONCURRENT START with await==
+script.js:2 starting slow promise
+script.js:12 starting fast promise
+1s sau đó:
+script.js:16 fast promise is done
+1s sau nữa:
+script.js:6 slow promise is done
+script.js:33 slow
+script.js:34 fast
+- Giải thích:
+concurrentStart() vào callstack, gặp log dòng "==CONCURRENT START with await=="
+ra đầu tiên. Tiếp đó là resolveAfter2Seconds() vào callstack, log dòng "starting slow promise"
+ra tiếp tục còn setTimeout thì vô webapi chờ sau 2s sẽ vào task queue. resolveAfter1Second()
+cũng được push vào callstack, dòng "starting fast promise" được in ra đầu tiên, còn setTimeout
+thì vô webapi chờ sau 1s sẽ trả giá trị vào callstack.
+Sau 1s: task queue sẽ có: resolve('fast'), console.log("fast promise is done")
+Sau 2s: task queue sẽ có: resolve('fast'), console.log("fast promise is done"), 
+resolve('slow'), console.log("slow promise is done")
+Theo qui tắc queue vô trước làm trước, thì thực hiện resolve('fast')
+->  biến fast trong hàm concurrentStart() được gán 'fast'
+rồi in ra màn "fast promise is done", 
+rồi thực hiện resolve('slow') -> biến slow concurrentStart() được gán 'slow'
+rồi in ra màn 'slow promise is done'
+nhưng vì trong hàm concurrentStart(), console.log(await slow), nghĩa là gián đoạn mọi async
+function đến khi slow được trả về cho nên dù slow được resolve ra sau nhưng vẫn được thực
+hiện trước -> slow được in ra màn hình rồi đến fast
+
+c) //setTimeout(concurrentPromise, 7000)
+- Đáp án và giải thích giống mục b
+
+d) //parallel
+- Đáp án:
+==PARALLEL with await Promise.all==
+script.js:2 starting slow promise
+script.js:12 starting fast promise
+1s sau đó:
+script.js:16 fast promise is done
+script.js:51 fast
+1s sau nữa:
+script.js:6 slow promise is done
+script.js:50 slow
+- Giải thích:
+Hàm parallel() được vào callstack, gặp log ra "==PARALLEL with await Promise.all==",
+await Promise all nghĩa là chờ cho đến TẤT CẢ promise thuộc các async function: 
+resolveAfter2Seconds() và resolveAfter1Second() được resolve() hay trả về giá trị.
+Tiếp đó là resolveAfter2Seconds() vào callstack, log dòng "starting slow promise"ra, 
+tiếp tục còn setTimeout thì vô webapi chờ sau 2s sẽ vào task queue. resolveAfter1Second()
+cũng được push vào callstack, dòng "starting fast promise" được in ra đầu tiên, còn setTimeout
+thì vô webapi chờ sau 1s sẽ trả giá trị vào callstack.
+Sau 1s: task queue sẽ có: resolve('fast'), console.log("fast promise is done")
+Theo qui tắc queue vô trước làm trước, thì thực hiện resolve('fast'), hàm callback 
+await resolveAfter1Second() bên trong promise all nhận được giá trị nhưng console.log thi vì
+task queue còn console.log("fast promise is done")
+=> in ra dòng "fast promise is done" rồi mới in ra 'fast'
+Sau 2s (1s sau nữa): task queue sẽ có: resolve('slow'), console.log("slow promise is done")
+Tương tự, 'slow promise is done được in ra trước', rồi đến 'slow'
+
+6) insertAdjacentHTML(position, html) là phương thức giúp chúng ta chèn code HTML 
+vào một vị trí chỉ định trong DOM. phương thức này nhận vào 2 tham số chính là vị trí và code HTML.
+ví dụ: node.insertAdjacentHTML('beforebegin', '<h1>Hello</h1>');
+
+7b) Thay vì viết 2 hàm getPokemonNames và getPokemon ta viết gộp lại thành một hàm, mình
+duyệt qua 1 mảng gồm tất cả các promise được fetch rồi promise.all để resolve cùng 1 lúc

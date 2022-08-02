@@ -1,0 +1,46 @@
+.red{
+    background-color: red;
+}
+.yellow{
+    background-color: yellow;
+}
+.green{
+    background-color: green;
+}
+.green1{
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    right: 100px;
+}
+.green2{
+    margin-top: 100px
+}
+.yellow1{
+    z-index: 100;
+    position: absolute;
+    top: 200px;
+    right: 100px;
+}
+.blue{
+    background-color: blue;
+    z-index: 100;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+.container {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 600px;
+    height: 600px;
+}
+.square{
+    width: 200px;
+    height: 200px;
+}
+.rectangle{
+    width: 300px;
+    height: 100px;
+}
